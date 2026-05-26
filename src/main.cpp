@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     QApplication::setApplicationVersion("1.0.0");
 
     // Set Application Icon globally for taskbar/task panel integration
-    app.setWindowIcon(QIcon(QDir::currentPath() + "/resources/icon.png"));
+    app.setWindowIcon(QIcon(":/resources/icon.png"));
 
     MainWindow window;
     window.show();

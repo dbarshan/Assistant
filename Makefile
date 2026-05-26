@@ -10,32 +10,29 @@ HEADER_DIR = header
 UI_DIR = ui
 BUILD_DIR = build
 
+# Define the Qt modules you need
+QT_MODULES = Qt6Widgets Qt6WebEngineWidgets Qt6WebEngineCore Qt6WebChannel Qt6Network Qt6Positioning
+
 # Include paths
-INCLUDES = -I. -I$(HEADER_DIR) \
-           -I/usr/include/x86_64-linux-gnu/qt6 \
-           -I/usr/include/x86_64-linux-gnu/qt6/QtWidgets \
-           -I/usr/include/x86_64-linux-gnu/qt6/QtGui \
-           -I/usr/include/x86_64-linux-gnu/qt6/QtCore \
-           -I/usr/include/x86_64-linux-gnu/qt6/QtWebEngineWidgets \
-           -I/usr/include/x86_64-linux-gnu/qt6/QtWebEngineCore \
-           -I/usr/include/x86_64-linux-gnu/qt6/QtWebChannel \
-           -I/usr/include/x86_64-linux-gnu/qt6/QtNetwork \
-           -I/usr/include/x86_64-linux-gnu/qt6/QtPositioning
+INCLUDES = -I. -I$(HEADER_DIR)
 
-CXXFLAGS = -std=c++17 -Wall -Wextra -O3 -fPIC $(INCLUDES)
+# Dynamically fetch the correct include paths and compiler flags
+CXXFLAGS = -std=c++17 -Wall -Wextra -O3 -fPIC $(INCLUDES) $(shell pkg-config --cflags $(QT_MODULES))
 
-LIBS = -L/usr/lib/x86_64-linux-gnu \
-       -lQt6WebEngineWidgets -lQt6WebEngineCore -lQt6Widgets -lQt6Gui -lQt6Core -lQt6WebChannel -lQt6Network
+# Dynamically fetch the correct linker flags
+LIBS = $(shell pkg-config --libs $(QT_MODULES))
 
-# Dynamically locate the Qt6 Meta-Object Compiler (MOC) and User Interface Compiler (UIC)
-MOC = $(shell which moc-qt6 2>/dev/null || which moc 2>/dev/null || echo /usr/lib/qt6/libexec/moc)
-UIC = $(shell which uic-qt6 2>/dev/null || which uic 2>/dev/null || echo /usr/lib/qt6/libexec/uic)
+# Dynamically locate the Qt6 MOC, UIC, and RCC tools
+QT_LIBEXEC = $(shell pkg-config --variable=libexecdir Qt6Core)
+MOC = $(shell which moc-qt6 2>/dev/null || which moc 2>/dev/null || echo $(QT_LIBEXEC)/moc)
+UIC = $(shell which uic-qt6 2>/dev/null || which uic 2>/dev/null || echo $(QT_LIBEXEC)/uic)
+RCC = $(shell which rcc-qt6 2>/dev/null || which rcc 2>/dev/null || echo $(QT_LIBEXEC)/rcc)
 
 # Target executable inside build folder
 TARGET = $(BUILD_DIR)/Assistant
 
 # Object files inside build folder
-OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/MainWindow.o $(BUILD_DIR)/moc_MainWindow.o
+OBJS = $(BUILD_DIR)/main.o $(BUILD_DIR)/MainWindow.o $(BUILD_DIR)/moc_MainWindow.o $(BUILD_DIR)/qrc_resources.o
 
 all: $(BUILD_DIR) $(TARGET)
 
@@ -68,6 +65,17 @@ $(BUILD_DIR)/moc_MainWindow.cpp: $(HEADER_DIR)/MainWindow.h
 # Compile the generated moc file
 $(BUILD_DIR)/moc_MainWindow.o: $(BUILD_DIR)/moc_MainWindow.cpp
 	@echo "Compiling generated MOC file $<..."
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Run Qt RCC to compile resources.qrc into qrc_resources.cpp inside build/
+$(BUILD_DIR)/qrc_resources.cpp: resources.qrc resources/icon.png resources/stylesheet.qss
+	@echo "Running Qt Resource Compiler (RCC) on $<..."
+	mkdir -p $(BUILD_DIR)
+	$(RCC) resources.qrc -o $(BUILD_DIR)/qrc_resources.cpp
+
+# Compile the generated QRC C++ file
+$(BUILD_DIR)/qrc_resources.o: $(BUILD_DIR)/qrc_resources.cpp
+	@echo "Compiling generated QRC file $<..."
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:

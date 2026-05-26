@@ -149,7 +149,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::setupUI() {
     // Load Brand Logo Icon into the pre-defined label
-    ui->brandIcon->setPixmap(QPixmap(QDir::currentPath() + "/resources/icon.png").scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    ui->brandIcon->setPixmap(QPixmap(":/resources/icon.png").scaled(24, 24, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     // Connect standard signals
     connect(ui->btnQuit, &QPushButton::clicked, qApp, &QCoreApplication::quit);
@@ -452,7 +452,7 @@ void MainWindow::showGrok() {
 // --- Dark/Light Theme Swapping ---
 
 void MainWindow::applyTheme() {
-    QFile file(QDir::currentPath() + "/resources/stylesheet.qss");
+    QFile file(":/resources/stylesheet.qss");
     if (file.open(QFile::ReadOnly | QFile::Text)) {
         QTextStream stream(&file);
         QString fullQss = stream.readAll();
@@ -481,7 +481,7 @@ void MainWindow::applyTheme() {
         if (btnMax) btnMax->setIcon(createMaximizeIcon(iconColor));
         if (btnCls) btnCls->setIcon(createCloseIcon(iconColor));
     } else {
-        qWarning() << "Could not open resources/stylesheet.qss from" << QDir::currentPath();
+        qWarning() << "Could not open resources/stylesheet.qss from resource system";
     }
 }
 
@@ -541,7 +541,7 @@ void MainWindow::mouseReleaseEvent(QMouseEvent *event) {
 void MainWindow::setupSystemTray() {
     // 1. Create System Tray Icon
     trayIcon = new QSystemTrayIcon(this);
-    trayIcon->setIcon(QIcon(QDir::currentPath() + "/resources/icon.png"));
+    trayIcon->setIcon(QIcon(":/resources/icon.png"));
     trayIcon->setToolTip("Assistant");
 
     // 2. Create Tray Context Menu
@@ -579,4 +579,5 @@ void MainWindow::restoreWindow() {
 void MainWindow::quitApplication() {
     isQuitting = true;
     this->close();
+    QCoreApplication::quit();
 }
