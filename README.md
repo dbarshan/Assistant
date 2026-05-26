@@ -4,6 +4,8 @@ A premium, secure, native C++ desktop client built with the **Qt6** framework an
 
 ---
 
+![Assistant Screenshot](docs/screenshot.png)
+
 ## 🌟 Key Features
 
 * **Sleek Minimalistic Header**: A custom-engineered title bar styled in a slim `44px` height with a premium glassmorphic border matching light and dark environments.
