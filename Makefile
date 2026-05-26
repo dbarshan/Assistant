@@ -67,11 +67,11 @@ $(BUILD_DIR)/moc_MainWindow.o: $(BUILD_DIR)/moc_MainWindow.cpp
 	@echo "Compiling generated MOC file $<..."
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# Run Qt RCC to compile resources.qrc into qrc_resources.cpp inside build/
-$(BUILD_DIR)/qrc_resources.cpp: resources.qrc resources/icon.png resources/stylesheet.qss
+# Run Qt RCC to compile resources/resources.qrc into qrc_resources.cpp inside build/
+$(BUILD_DIR)/qrc_resources.cpp: resources/resources.qrc resources/icon.png resources/stylesheet.qss
 	@echo "Running Qt Resource Compiler (RCC) on $<..."
 	mkdir -p $(BUILD_DIR)
-	$(RCC) resources.qrc -o $(BUILD_DIR)/qrc_resources.cpp
+	$(RCC) resources/resources.qrc -o $(BUILD_DIR)/qrc_resources.cpp
 
 # Compile the generated QRC C++ file
 $(BUILD_DIR)/qrc_resources.o: $(BUILD_DIR)/qrc_resources.cpp
